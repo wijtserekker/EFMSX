@@ -1,0 +1,108 @@
+import json
+import os
+
+HISTORY = 'json/fixed_history.json'
+ARTISTS = 'json/artists.json'
+GENRES = 'json/genres.json'
+ARTISTS_OUT = 'json/artists.json'
+GENRES_OUT = 'json/genres.json'
+ARTIST_NAME = 'master_metadata_album_artist_name'
+BAR_LENGTH = 55
+
+with open(HISTORY, 'r') as file:
+    c_history = json.load(file)
+
+with open(ARTISTS, 'r') as file:
+    c_artist_genres = json.load(file)
+
+with open(GENRES, 'r') as file:
+    c_genres = json.load(file)
+
+history = c_history['data']
+artists = c_artist_genres['data']
+genres = c_genres['data']
+
+
+all_artists = set()
+for history_field in history:
+
+    break_outer = 0
+
+    artist_name = ""
+    if ARTIST_NAME in history_field.keys():
+        artist_name = history_field[ARTIST_NAME]
+        all_artists.add(artist_name)
+
+
+known_artists = [field['artist'] for field in artists]
+known_genres = genres
+known_genres_str = ''
+for i in range(0, len(genres)):
+    genre = known_genres[i]
+    genre_str = str(i + 1) + ' ' + genre + '\n'
+    known_genres_str += genre_str
+
+
+for history_field in history:
+
+    break_outer = 0
+
+    artist_name = ""
+    if ARTIST_NAME in history_field.keys():
+        artist_name = history_field[ARTIST_NAME]
+
+    if artist_name not in known_artists:
+
+        percent = len(known_artists) / len(all_artists)
+        print(len(known_artists), len(all_artists))
+        bar = "[" + "|"*int(percent * BAR_LENGTH) + "-"*int((1 - percent) * BAR_LENGTH) + "] (" + str(int(percent*100)) + "%)\n"
+
+        response = input(bar +
+                         '-------------------------------------------------------------\n'
+                         'ARTIST = ' + artist_name + '\n'
+                         '-------------------------------------------------------------\n'
+                         'What is the genre of this artist?\n' +
+                         known_genres_str +
+                         '\n\n' +
+                         str(len(genres)+1) +
+                         ' Other')
+
+        if int(response) in range(0, len(genres)):
+            known_artists.append(artist_name)
+            artists.append({'artist': artist_name, 'genre': genres[int(response) - 1]})
+
+        elif int(response) == len(genres) + 1:
+            new_genre = input("What is the name of the new genre?")
+            genres.append(new_genre)
+            for i in range(0, len(genres)):
+                genre = known_genres[i]
+                genre_str = str(i + 1) + ' ' + genre + '\n'
+                known_genres_str += genre_str
+
+            known_artists.append(artist_name)
+            artists.append({'artist': artist_name, 'genre': new_genre})
+
+        elif response == '-1':
+            break_outer = 1
+            break
+
+        else:
+            print("That's not a valid option! Artist will be skipped.")
+
+    if break_outer == 1:
+        break
+
+
+os.remove(ARTISTS_OUT)
+os.remove(GENRES_OUT)
+
+with open(ARTISTS_OUT, 'w+') as file:
+    file.write('{"data": ')
+    file.write(json.dumps(artists))
+    file.write('}')
+
+with open(GENRES_OUT, 'w+') as file:
+    file.write('{"data": ')
+    file.write(json.dumps(genres))
+    file.write('}')
+
