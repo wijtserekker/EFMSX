@@ -9,13 +9,13 @@ FILENAME = 'json/fixed_history.json'
 TIMESTAMP = 'ts'
 ARTIST_NAME = 'master_metadata_album_artist_name'
 
-ARTIST_THRESHOLD = 500
+ARTIST_THRESHOLD = 200
 DAY_RANGE = (1, 366)  # Normally (1, 366)
-MON_RANGE = (1, 2)  # Normally (1, 13)
+MON_RANGE = (1, 13)  # Normally (1, 13)
 YEAR = 2018
 TS_FORMAT = '%Y-%m-%d %H:%M:%S'
 
-TIMESCALE = 0
+TIMESCALE = 1
 
 
 with open(FILENAME) as file:
@@ -72,8 +72,8 @@ y_artists_np = np.vstack(y_artists)
 y_percent = y_artists_np / y_artists_np.sum(axis=0).astype(float) * 100
 
 fig_size = plt.rcParams['figure.figsize']
-fig_size[0] = 18
-fig_size[1] = 9
+fig_size[0] = 3
+fig_size[1] = 2
 plt.rcParams['figure.figsize'] = fig_size
 plt.rcParams['figure.dpi'] = 300
 
@@ -83,6 +83,8 @@ sns.set_palette(sns.color_palette('hls', len(y_labels)))
 
 fig, ax = plt.subplots()
 
+
+
 if TIMESCALE == 0:
     ax.stackplot(x_days, y_percent, labels=y_labels)
 if TIMESCALE == 1:
@@ -90,7 +92,7 @@ if TIMESCALE == 1:
 
 chart_box = ax.get_position()
 # ax.set_position([chart_box.x0, chart_box.y0, chart_box.x1*0.1, chart_box.y1])
-ax.legend(loc='upper center', bbox_to_anchor=(1.06, 1))
+ax.legend(loc='upper center', bbox_to_anchor=(1.23, 1), prop={'size': 3})
 plt.show()
 
 # print(artists_dict)
